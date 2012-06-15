@@ -61,7 +61,7 @@ object NumberToWords {
   
   private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
     case 0 if i > 0 => convert(i / 1000, dividers.tail)
-    case 0 => List(Nil)
+    case 0 => Nil
     case j => convertNamedNumber(j, dividers.head) :: convert(i / 1000, dividers.tail)
   }
   
