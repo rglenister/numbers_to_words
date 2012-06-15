@@ -3,6 +3,7 @@ package numtowords
 
 object NumberToWords {
 
+  val units = 0L
   val hundred = 100L
   val thousand = 1000L
   val million = 1000000L
@@ -50,18 +51,18 @@ object NumberToWords {
     quintillion -> "quintillion"
   )
   
-  val dividerList = List(quintillion, quadrillion, trillion, billion, million, thousand)
+  val dividerList = List(units, thousand, million, billion, trillion, quadrillion, quintillion)
   
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
     case 0 => "zero"
-    case _ => convertLargeNumber(i, dividerList).filterNot(_ isEmpty).mkString(" ")
+    case _ => convert(i, dividerList).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
   }
   
-  private def convertLargeNumber(i: Long, dividers: List[Long]): List[String] = dividers match {
-    case divider :: t if 1 until 1000 contains i / divider => convertNamedNumber(i / divider, divider) ++ convertLargeNumber(i % divider, t)
-    case divider :: t => convertLargeNumber(i % divider, dividers.tail) 
-    case _ => convertSmallNumber(i)
+  private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
+    case 0 if i > 0 => convert(i / 1000, dividers.tail)
+    case 0 => List(Nil)
+    case j => convertNamedNumber(j, dividers.head) :: convert(i / 1000, dividers.tail)
   }
   
   private def convertNamedNumber(i: Long, divider: Long): List[String] = convertSmallNumber(i) ++ List(lookup(divider))
