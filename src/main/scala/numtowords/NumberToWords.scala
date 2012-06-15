@@ -55,27 +55,27 @@ object NumberToWords {
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
     case 0 => "zero"
-    case _ => convertLargeNumber(i, dividerList).filterNot(_ isEmpty).reverse.mkString(" ")
+    case _ => convertLargeNumber(i, dividerList).filterNot(_ isEmpty).mkString(" ")
   }
   
   private def convertLargeNumber(i: Long, dividers: List[Long]): List[String] = dividers match {
-    case divider :: t if 1 until 1000 contains i / divider => convertLargeNumber(i % divider, t) ++ convertNamedNumber(i / divider, divider)
+    case divider :: t if 1 until 1000 contains i / divider => convertNamedNumber(i / divider, divider) ++ convertLargeNumber(i % divider, t)
     case divider :: t => convertLargeNumber(i % divider, dividers.tail) 
     case _ => convertSmallNumber(i)
   }
   
-  private def convertNamedNumber(i: Long, divider: Long): List[String] = lookup(divider) :: convertSmallNumber(i)
+  private def convertNamedNumber(i: Long, divider: Long): List[String] = convertSmallNumber(i) ++ List(lookup(divider))
   
-  private def convertSmallNumber(i: Long): List[String] = convertTens(i) ++ convertHundreds(i)
+  private def convertSmallNumber(i: Long): List[String] = convertHundreds(i) ++ convertTens(i)
   
   private def convertHundreds(i: Long): List[String] = i / 100 match {
-    case j if j > 0 => lookup(hundred) :: lookup(j) :: Nil
+    case j if j > 0 =>  lookup(j) :: lookup(hundred) :: Nil
     case _ => Nil
   }
   
   private def convertTens(i: Long): List[String] = i % 100 match {
     case 0 => Nil
     case j if j <= 20 => lookup(j) :: Nil
-    case k => lookup(k % 10) :: lookup(k / 10 * 10) :: Nil
+    case k => lookup(k - k % 10) :: lookup(k % 10) :: Nil
   }  
 }
