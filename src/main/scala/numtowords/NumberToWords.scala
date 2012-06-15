@@ -3,17 +3,7 @@ package numtowords
 
 object NumberToWords {
 
-  val units = 0L
-  val hundred = 100L
-  val thousand = 1000L
-  val million = 1000000L
-  val billion = 1000000000L
-  val trillion = 1000000000000L
-  val quadrillion = 1000000000000000L
-  val quintillion = 1000000000000000000L
-  
-  
-  val lookup = Map(
+  val smallNumberNameMap = Map(
     0L -> "",
     1L -> "one",
     2L -> "two",
@@ -42,37 +32,39 @@ object NumberToWords {
     70L -> "seventy",
     80L -> "eighty",
     90L -> "ninety",
-    hundred -> "hundred",
-    thousand -> "thousand",
-    million -> "million",
-    billion -> "billion",
-    trillion -> "trillion",
-    quadrillion -> "quadrillion",
-    quintillion -> "quintillion"
+    100L -> "hundred"
   )
   
-  val dividerList = List(units, thousand, million, billion, trillion, quadrillion, quintillion)
+  val largeNumberNameMap = Map(
+    0L -> "",
+    1000L -> "thousand",
+    1000000L -> "million",
+    1000000000L -> "billion",
+    1000000000000L -> "trillion",
+    1000000000000000L -> "quadrillion",
+    1000000000000000000L -> "quintillion"
+  )
   
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
     case 0 => "zero"
-    case _ => convert(i, dividerList).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
+    case _ => convert(i, largeNumberNameMap.keys.toList.sorted).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
   }
   
   private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
     case 0 if i > 0 => convert(i / 1000, dividers.tail)
     case 0 => Nil
-    case j => convertHundreds(j) ++ convertTens(j) ++ List(lookup(dividers.head)) :: convert(i / 1000, dividers.tail)
+    case j => convertHundreds(j) ++ convertTens(j) ++ List(largeNumberNameMap(dividers.head)) :: convert(i / 1000, dividers.tail)
   }
   
   private def convertHundreds(i: Long): List[String] = i / 100 match {
-    case j if j > 0 =>  lookup(j) :: lookup(hundred) :: Nil
+    case j if j > 0 =>  smallNumberNameMap(j) :: smallNumberNameMap(100L) :: Nil
     case _ => Nil
   }
   
   private def convertTens(i: Long): List[String] = i % 100 match {
     case 0 => Nil
-    case j if j <= 20 => lookup(j) :: Nil
-    case k => lookup(k - k % 10) :: lookup(k % 10) :: Nil
+    case j if j <= 20 => smallNumberNameMap(j) :: Nil
+    case k => smallNumberNameMap(k - k % 10) :: smallNumberNameMap(k % 10) :: Nil
   }  
 }
