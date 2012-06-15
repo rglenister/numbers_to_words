@@ -62,10 +62,8 @@ object NumberToWords {
   private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
     case 0 if i > 0 => convert(i / 1000, dividers.tail)
     case 0 => Nil
-    case j => convertNamedNumber(j, dividers.head) :: convert(i / 1000, dividers.tail)
+    case j => convertHundreds(j) ++ convertTens(j) ++ List(lookup(dividers.head)) :: convert(i / 1000, dividers.tail)
   }
-  
-  private def convertNamedNumber(i: Long, divider: Long): List[String] = convertHundreds(i) ++ convertTens(i) ++ List(lookup(divider))
   
   private def convertHundreds(i: Long): List[String] = i / 100 match {
     case j if j > 0 =>  lookup(j) :: lookup(hundred) :: Nil
