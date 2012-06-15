@@ -65,9 +65,7 @@ object NumberToWords {
     case j => convertNamedNumber(j, dividers.head) :: convert(i / 1000, dividers.tail)
   }
   
-  private def convertNamedNumber(i: Long, divider: Long): List[String] = convertSmallNumber(i) ++ List(lookup(divider))
-  
-  private def convertSmallNumber(i: Long): List[String] = convertHundreds(i) ++ convertTens(i)
+  private def convertNamedNumber(i: Long, divider: Long): List[String] = convertHundreds(i) ++ convertTens(i) ++ List(lookup(divider))
   
   private def convertHundreds(i: Long): List[String] = i / 100 match {
     case j if j > 0 =>  lookup(j) :: lookup(hundred) :: Nil
