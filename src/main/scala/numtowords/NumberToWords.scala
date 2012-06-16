@@ -3,7 +3,7 @@ package numtowords
 
 object NumberToWords {
 
-  val smallNumberNameMap = Map(
+  private val smallNumberNameMap = Map(
     0L -> "",
     1L -> "one",
     2L -> "two",
@@ -35,7 +35,7 @@ object NumberToWords {
     100L -> "hundred"
   )
   
-  val largeNumberNameMap = Map(
+  private val largeNumberNameMap = Map(
     0L -> "",
     1000L -> "thousand",
     1000000L -> "million",
@@ -45,7 +45,7 @@ object NumberToWords {
     1000000000000000000L -> "quintillion"
   )
   
-  val dividerList = largeNumberNameMap.keys.toList.sorted
+  private val dividerList = largeNumberNameMap.keys.toList.sorted
   
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
@@ -56,7 +56,7 @@ object NumberToWords {
   private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
     case 0 if i > 0 => convert(i / 1000, dividers.tail)
     case 0 => Nil
-    case j => convertHundreds(j) ++ convertTens(j) ++ List(largeNumberNameMap(dividers.head)) :: convert(i / 1000, dividers.tail)
+    case j => List(largeNumberNameMap(dividers.head)) :: convertTens(j) :: convertHundreds(j) :: convert(i / 1000, dividers.tail)
   }
   
   private def convertHundreds(i: Long): List[String] = i / 100 match {
