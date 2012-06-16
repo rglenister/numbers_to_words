@@ -45,10 +45,12 @@ object NumberToWords {
     1000000000000000000L -> "quintillion"
   )
   
+  val dividerList = largeNumberNameMap.keys.toList.sorted
+  
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
     case 0 => "zero"
-    case _ => convert(i, largeNumberNameMap.keys.toList.sorted).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
+    case _ => convert(i, dividerList).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
   }
   
   private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
