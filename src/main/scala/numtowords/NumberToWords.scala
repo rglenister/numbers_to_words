@@ -65,7 +65,6 @@ object NumberToWords {
   }
   
   private def convertTens(i: Long): List[String] = i % 100 match {
-    case 0 => Nil
     case j if j <= 20 => smallNumberNameMap(j) :: Nil
     case k => smallNumberNameMap(k - k % 10) :: smallNumberNameMap(k % 10) :: Nil
   }  
