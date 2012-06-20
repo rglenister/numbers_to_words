@@ -35,37 +35,43 @@ object NumberToWords {
     100L -> "hundred"
   )
   
-  private val largeNumberNameMap = Map(
-    0L -> "",
-    1000L -> "thousand",
-    1000000L -> "million",
-    1000000000L -> "billion",
-    1000000000000L -> "trillion",
-    1000000000000000L -> "quadrillion",
-    1000000000000000000L -> "quintillion"
-  )
-  
-  private val dividerList = largeNumberNameMap.keys.toList.sorted
+  private val largeNumberNames = List("", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion")
   
   def numberToWords(i: Long): String = i match {
     case _ if i < 0 => "minus " + numberToWords(-i)
     case 0 => "zero"
-    case _ => convert(i, dividerList).reverse.flatten.filterNot(_ isEmpty).mkString(" ")
+    case _ => normalizeWhiteSpace(convert(i, largeNumberNames).trim)
   }
   
-  private def convert(i: Long, dividers: List[Long]): List[List[String]] = i % 1000 match {
-    case 0 if i > 0 => convert(i / 1000, dividers.tail)
-    case 0 => Nil
-    case j => List(largeNumberNameMap(dividers.head)) :: convertTens(j) :: convertHundreds(j) :: convert(i / 1000, dividers.tail)
+  private def convert(i: Long, dividers: List[String]): String = {
+    if (i > 0) {
+      convert(i / 1000, dividers.tail) + " " + convertNamedLargeNumber(i % 1000, dividers.head)
+    } else ""
   }
   
-  private def convertHundreds(i: Long): List[String] = i / 100 match {
-    case j if j > 0 =>  smallNumberNameMap(j) :: smallNumberNameMap(100L) :: Nil
-    case _ => Nil
+  private def convertNamedLargeNumber(i: Long, largeNumberName: String): String = {
+    if (i > 0) {
+      convertHundreds(i / 100) + " " +  convertTens(i % 100) + " " + largeNumberName 
+    } else ""
   }
   
-  private def convertTens(i: Long): List[String] = i % 100 match {
-    case j if j <= 20 => smallNumberNameMap(j) :: Nil
-    case k => smallNumberNameMap(k - k % 10) :: smallNumberNameMap(k % 10) :: Nil
+  private def convertHundreds(i: Long): String = {
+    if (i > 0) {
+      smallNumberNameMap(i) + " " + smallNumberNameMap(100L)
+    } else {
+       ""
+    }
+  }
+  
+  private def convertTens(i: Long): String = {
+    if (i <= 20) {
+      smallNumberNameMap(i)
+    } else {
+      smallNumberNameMap(i - i % 10) + " " + smallNumberNameMap(i % 10)
+    }
   }  
+  
+  private def normalizeWhiteSpace(s: String) = {
+    s replaceAll("\\s+", " ")
+  }
 }

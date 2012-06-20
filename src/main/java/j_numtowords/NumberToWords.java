@@ -39,21 +39,7 @@ public class NumberToWords {
 		smallNumberNameMap.put(100L, "hundred");
 	}
 	
-	private static final Map<Long, String> largeNumberNameMap = new HashMap<Long, String>();
-	static {
-		largeNumberNameMap.put(0L, "");
-		largeNumberNameMap.put(1000L,"thousand");
-		largeNumberNameMap.put(1000000L, "million");
-		largeNumberNameMap.put(1000000000L, "billion");
-		largeNumberNameMap.put(1000000000000L , "trillion");
-		largeNumberNameMap.put(1000000000000000L , "quadrillion");
-		largeNumberNameMap.put(1000000000000000000L, "quintillion");
-	}
-	
-	private static final Long[] dividerList = largeNumberNameMap.keySet().toArray(new Long[0]);
-	static {
-		Arrays.sort(dividerList);
-	}
+	private static final String[] largeNumberNames = { "", "thousand", "million", "billion", "trillion", "quadrillion", "quintillion" };
 	
 	public static String numberToWords(final long i) {
 		return i < 0?
@@ -62,16 +48,21 @@ public class NumberToWords {
 							"zero" :
 								normaliseWhiteSpace(convert(i, 0));
 	}
+
+	private static String convert(final Long i, final int largeNumberNamesIndex) {
+	    if (i > 0) {
+	        return convert(i / 1000, largeNumberNamesIndex + 1) + " " + convertNamedLargeNumber(i % 1000, largeNumberNames[largeNumberNamesIndex]);
+	    } else {
+	    	return "";		
+	    }
+	}
 	
-	private static String convert(final long i, final int dividerListIndex) {
-		final long j = i % 1000;
-		if (j != 0) {
-			return convert(i / 1000, dividerListIndex + 1) + " " + convertHundreds(j / 100) + " " + convertTens(j % 100) + " " + largeNumberNameMap.get(dividerList[dividerListIndex]);
-		} else if (i > 0) {
-			return convert(i / 1000, dividerListIndex + 1);
-		} else {
-			return "";			
-		}
+	private static String convertNamedLargeNumber(final long i, final String largeNumberName) {
+	    if (i > 0) {
+	        return convertHundreds(i / 100) + " " +  convertTens(i % 100) + " " + largeNumberName;
+	    } else {
+	    	return "";
+	    }
 	}
 	
 	private static String convertHundreds(final Long i) {
